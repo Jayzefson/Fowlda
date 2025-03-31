@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fowlda</title>
+    <link rel="stylesheet" href="{% static 'style/estilo.css' %}">
+    <script>
+        function redirectToLink(selectElement) {
+            const selectedValue = selectElement.value;
+            if (selectedValue) {
+                window.location.href = selectedValue;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navegacao">
+        <div class="navegacao-items">
+            <div class="list-choice">
+                <div class="list-choice-title">Conversores</div>
+                <div class="list-choice-objects">
+                    <label>
+                        <a href="{% url 'conversao' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Documentos</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'IMG' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Imagens</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'PLA' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Planilhas</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'VID' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Vídeo</span>
+                        </a>
+                    </label>
+                </div>
+            </div>
+            <a href="{% url 'ajuda' %}">
+                <button class="button-55" role="button">
+                    <span class="text">Ajuda</span>
+                </button>
+            </a>
+        </div>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <div class="navegacao-items">
+            <h2 class="titulo-nav">FOWLDA</h2>
+            <a href="{% url 'historico' %}">
+                <button class="button-55" id="perfil">
+                    <p>Meus Arquivos</p>
+                    <figure>
+                        <img src="{% static 'images/perfil.png' %}" alt="perfil" width="40">
+                    </figure>
+                </button>
+            </a>
+        </div>
+    </nav>
+    <div class="alinhamento">
+        <div class="titulo1">
+            <figure>
+                <img src="{% static 'images/pasta.png' %}" alt="pasta" width="80">
+            </figure>
+            <div class="principal">
+                <h1>FOWLDA</h1>
+            </div>
+            <figure>
+                <img src="{% static 'images/pasta.png' %}" alt="pasta" width="80">
+            </figure>
+        </div>
+        <div class="text1">
+            <p>
+                Transforme seus arquivos de maneira rápida e fácil com nosso conversor online. Com suporte para uma
+                ampla
+                variedade de formatos, oferecemos uma solução completa para suas necessidades de conversão de
+                documentos,
+                imagens, áudio e vídeo. Seja você um profissional buscando converter arquivos de trabalho ou um usuário
+                comum precisando de uma solução prática, nosso site está aqui para ajudar.
+            </p>
+        </div>
+        <br>
+        <br>
+        <div>
+            <button class="button-55" role="button" onclick="togglePopup()" style="padding: 1rem;">CONVERTER
+                ARQUIVOS</button>
+        </div>
+
+        <div class="overlay" id="overlay" style="display: none;"></div>
+
+        <div class="popup" id="popup" style="display: none;">
+            <h2 class="titulo-nav" style="font-size: 2rem;">Selecione o conversor que deseja usar</h2>
+            <a href="{% url 'conversao' %}">
+                <button class="button-55">
+                    Documentos
+                </button>
+            </a>
+            <a href="{% url 'PLA' %}">
+                <button class="button-55">
+                    Planilhas
+                </button>
+            </a>
+            <a href="{% url 'VID' %}">
+                <button class="button-55">
+                    Vídeos
+                </button>
+            </a>
+            <a href="{% url 'IMG' %}">
+                <button class="button-55">
+                    Imagens
+                </button>
+            </a>
+            <button style="background-color: rgb(219, 77, 77);" class="button-55" onclick="togglePopup()"
+                aria-label="Fechar">&times;</button>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <footer>
+        <div>
+            <h2>Conversores</h2>
+            <ul>
+                <a class="links" href="{% url 'conversao' %}">
+                    <li>Conversor de Documentos</li>
+                </a>
+                <a class="links" href="{% url 'IMG' %}">
+                    <li>Conversor de Imagens</li>
+                </a>
+                <a class="links" href="{% url 'PLA' %}">
+                    <li>Conversor de Planilhas</li>
+                </a>
+                <a class="links" href="{% url 'VID' %}">
+                    <li>Conversor de Vídeos</li>
+                </a>
+            </ul>
+        </div>
+        <div>
+            <h1>Fowlda</h1>
+        </div>
+        <div>
+            <h2>Envie-nos seu feedback</h2>
+            <ul>
+                <a class="links" href="{% url 'historico' %}#feedback">
+                    <li>Escrever mensagem</li>
+                </a>
+            </ul>
+        </div>
+    </footer>
+    <script>
+        function togglePopup() {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const isVisible = popup.style.display === 'block';
+
+            popup.style.display = isVisible ? 'none' : 'block';
+            overlay.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function toggleMenu() {
+            const menu = document.querySelector('.navegacao');
+            menu.classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>

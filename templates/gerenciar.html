@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fowlda</title>
+    <link rel="stylesheet" href="{% static 'style/estilo.css' %}">
+    <script>
+        function redirectToLink(selectElement) {
+            const selectedValue = selectElement.value;
+            if (selectedValue) {
+                window.location.href = selectedValue;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navegacao">
+        <div class="navegacao-items">
+            <a href="{% url 'index' %}">
+                <button class="button-55-2" role="button">
+                    <span class="text">Voltar</span>
+                </button>
+            </a>
+            <div class="list-choice">
+                <div class="list-choice-title">Conversores</div>
+                <div class="list-choice-objects">
+                    <label>
+                        <a href="{% url 'conversao' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Documentos</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'IMG' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Imagens</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'PLA' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Planilhas</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'VID' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Vídeo</span>
+                        </a>
+                    </label>
+                </div>
+            </div>
+            <a href="{% url 'ajuda' %}">
+                <button class="button-55" role="button">
+                    <span class="text">Ajuda</span>
+                </button>
+            </a>
+        </div>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <div class="navegacao-items">
+            <h2 class="titulo-nav">FOWLDA</h2>
+            <a href="{% url 'historico' %}">
+                <button class="button-55" id="perfil">
+                    <p>Meus Arquivos</p>
+                    <figure>
+                        <img src="{% static 'images/perfil.png' %}" alt="perfil" width="40">
+                    </figure>
+                </button>
+            </a>
+        </div>
+    </nav>
+    <div class="alinhamento">
+        <div id="overlay" style="display: none;" class="overlay"></div>
+        <div id="popup" style="display: none;" class="popup">
+            <div class="popup-content">
+                <h2 id="popup-message"></h2>
+                <form id="popup-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="popup-hidden-id" name="">
+                    <button type="submit" class="button-55"">Confirmar</button>
+                    <button type="button" style="width: 100%;" class="button-55-2" onclick="togglePopup()">Cancelar</button>
+                </form>
+            </div>
+        </div>
+        <div class="principal2">
+            <h1>
+                Usuários Cadastrados
+            </h1>
+        </div>
+        <div class="scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome de Usuário</th>
+                        <th>E-mail</th>
+                        <th>Data de Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>{{ usuario.username }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.date_joined|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if not usuario.is_superuser %}
+                            <button class="button-55-2" 
+                                    onclick="confirmDeletion('usuario_id', {{ usuario.id }}, 'Tem certeza de que deseja excluir o usuário {{ usuario.username }}?');">
+                                Excluir
+                            </button>
+                            {% else %}
+                            <span style="color: gray;">Superuser</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="principal2">
+            <h1>Gerenciar Formatos</h1>
+        </div>
+        <div class="scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Extensão</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for formato in formatos %}
+                    <tr>
+                        <td>{{ formato.get_categoria_display }}</td>
+                        <td>{{ formato.extensao }}</td>
+                        <td>
+                            <button class="button-55-2"
+                                    onclick="confirmDeletion('formato_id', {{ formato.id }}, 'Tem certeza de que deseja excluir o formato {{ formato.extensao }}?');">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>          
+        </div>
+        <div class="principal2">
+            <h1>Adicionar Novo Formato</h1>
+        </div>
+        <form method="post" class="formulario">
+            {% csrf_token %}
+            <label for="categoria">Categoria:</label>
+            <select name="categoria" id="categoria" required>
+                <option value="Documentos">Documentos</option>
+                <option value="Imagens">Imagens</option>
+                <option value="Planilhas">Planilhas</option>
+                <option value="Vídeos">Vídeos</option>
+            </select>
+            <label for="extensao">Extensão:</label>
+            <input type="text" id="extensao" name="extensao" maxlength="10" placeholder="Ex: PDF" required>
+            <button type="submit" class="button-55">Adicionar</button>
+        </form>
+    </div>
+    
+    <br>
+    <br>
+    <footer>
+        <div>
+            <h2>Conversores</h2>
+            <ul>
+                <a class="links" href="{% url 'conversao' %}">
+                    <li>Conversor de Documentos</li>
+                </a>
+                <a class="links" href="{% url 'IMG' %}">
+                    <li>Conversor de Imagens</li>
+                </a>
+                <a class="links" href="{% url 'PLA' %}">
+                    <li>Conversor de Planilhas</li>
+                </a>
+                <a class="links" href="{% url 'VID' %}">
+                    <li>Conversor de Vídeos</li>
+                </a>
+            </ul>
+        </div>
+        <div>
+            <h1>Fowlda</h1>
+        </div>
+        <div>
+            <h2>Envie-nos seu feedback</h2>
+            <ul>
+                <a class="links" href="{% url 'historico' %}#feedback">
+                    <li>Escrever mensagem</li>
+                </a>
+            </ul>
+        </div>
+    </footer>
+    <script>
+        function togglePopup() {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const isVisible = popup.style.display === 'block';
+
+            popup.style.display = isVisible ? 'none' : 'block';
+            overlay.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function toggleMenu() {
+            const menu = document.querySelector('.navegacao');
+            menu.classList.toggle('active');
+        }
+
+        function confirmDeletion(inputName, id, message) {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const popupMessage = document.getElementById('popup-message');
+            const popupForm = document.getElementById('popup-form');
+            const popupHiddenInput = document.getElementById('popup-hidden-id');
+
+            // Atualiza o conteúdo do popup
+            popupMessage.innerText = message;
+            popupForm.setAttribute('action', '{% url "gerenciar" %}');
+            popupHiddenInput.name = inputName;
+            popupHiddenInput.value = id;
+
+            // Mostra o popup e o overlay
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        // Oculta o popup e o overlay ao clicar no overlay
+        document.getElementById('overlay').addEventListener('click', togglePopup);
+    </script>
+</body>
+
+</html>

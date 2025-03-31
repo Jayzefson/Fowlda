@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converter Arquivos</title>
+    <link rel="stylesheet" href="{% static 'style/estilo.css' %}">
+</head>
+
+<body>
+    <nav class="navegacao">
+        <div class="navegacao-items">
+            <a href="{% url 'index' %}">
+                <button class="button-55-2" role="button">
+                    <span class="text">Voltar</span>
+                </button>
+            </a>
+            <div class="list-choice">
+                <div class="list-choice-title">Conversores</div>
+                <div class="list-choice-objects">
+                    <label>
+                        <a href="{% url 'conversao' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Documentos</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'IMG' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Imagens</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'PLA' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Planilhas</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'VID' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Vídeo</span>
+                        </a>
+                    </label>
+                </div>
+            </div>
+            <a href="{% url 'ajuda' %}">
+                <button class="button-55" role="button">
+                    <span class="text">Ajuda</span>
+                </button>
+            </a>
+        </div>
+        <div class="navegacao-items">
+            <h2 class="titulo-nav">FOWLDA</h2>
+            <a href="{% url 'historico' %}">
+                <button class="button-55" id="perfil">
+                    <p>Meus Arquivos</p>
+                    <figure>
+                        <img src="{% static 'images/perfil.png' %}" alt="perfil" width="40">
+                    </figure>
+                </button>
+            </a>
+        </div>
+    </nav>
+    <div class="alinhamento">
+        <div class="principal2">
+            <h1>
+                Converter Vídeos
+            </h1>
+        </div>
+        <div class="conversao-grid">
+            <div style="grid-area: a1; padding: 5rem;">
+                <h2>Conversão</h2>
+                <p class="text2">
+                    Para converter o arquivo, verifique os formatos suportados, selecione ou arraste o arquivo desejado
+                    até a área indicada. Em seguida, escolha o formato de saída dentre os disponíveis.
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div class="dropzone" id="drop-zone" style="grid-area: a2; padding: 5rem;  text-align: center;">
+                    <figure>
+                        <img src="{% static 'images/upload.png' %}" alt="upload" width="80">
+                    </figure>
+                    <p>Selecione ou Arraste seus arquivos aqui.</p>
+
+                </div>
+                <form class="fileForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+
+                    <select class="list-choice" id="format-select">
+                        <option value="">Selecione o formato de saída</option>
+                    </select>
+
+                    <button type="submit" class="button-55" id="submit-button" disabled>Enviar</button>
+                </form>
+            </div>
+            <div style="grid-area: a3; padding: 5rem;">
+                <h2>Simplicidade</h2>
+                <p class="text2">
+                    O conversor pode ser acessado em qualquer dispositivo com acesso à internet, não é necessário a
+                    instalação
+                    de nenhum programa em seu dispositivo.
+                </p>
+            </div>
+            <figure style="grid-area: a4; padding: 5rem; text-align: center;">
+                <img src="{% static 'images/audio.png' %}" alt="audio" width="110">
+            </figure>
+            <div class="carl" style="grid-area: a5; padding: 5rem;">
+                <h2>Variedade de Formatos</h2>
+                <p class="text2">
+                    A ferramenta funciona com diversos tipos de multimídia diferente como MP3 e MP4. Além
+                    disso,
+                    todas as conversões são feitas na nuvem, portanto, nenhuma conversão ocupará espaço no seu
+                    armazenamento.
+                </p>
+            </div>
+            <figure style="grid-area: a6; padding: 5rem; text-align: center;">
+                <img src="{% static 'images/video.png' %}" alt="video" width="110">
+            </figure>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <footer>
+        <div>
+            <h2>Conversores</h2>
+            <ul>
+                <a class="links" href="{% url 'conversao' %}">
+                    <li>Conversor de Documentos</li>
+                </a>
+                <a class="links" href="{% url 'IMG' %}">
+                    <li>Conversor de Imagens</li>
+                </a>
+                <a class="links" href="{% url 'PLA' %}">
+                    <li>Conversor de Planilhas</li>
+                </a>
+                <a class="links" href="{% url 'VID' %}">
+                    <li>Conversor de Vídeos</li>
+                </a>
+            </ul>
+        </div>
+        <div>
+            <h1>Fowlda</h1>
+        </div>
+        <div>
+            <h2>Envie-nos seu feedback</h2>
+            <ul>
+                <a class="links" href="{% url 'historico' %}#feedback">
+                    <li>Escrever mensagem</li>
+                </a>
+            </ul>
+        </div>
+    </footer>
+    <script>
+
+        //selecionar Usuário
+
+        function Selecionar(usuario) {
+            const select = document.getElementById('CampoUsu')
+
+            if (!select) {
+                console.error('Elemento com id "campoUsu" não encontrado.');
+                return;
+            }
+
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].text === usuario) {
+                    select.selectedIndex = i
+                    break
+                }
+            }
+        }
+
+        Selecionar("{{ usu }}")
+
+        //resto
+
+        function uploadFiles(files) {
+            const formData = new FormData();
+            const selectedFormat = document.getElementById('format-select').value;
+            formData.append('format', selectedFormat);
+            for (const file of files) {
+                formData.append('files', file);
+            }
+
+            fetch('/upload/', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar o arquivo:', error);
+                });
+        }
+
+        // adicionando chave aleatória
+
+        chaveCampo = document.getElementById('id_chave')
+
+        function chaveSeguranca() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            let chave = ''
+
+            for (let i = 0; i < 25; i++) {
+                const indice = Math.floor(Math.random() * caracteres.length)
+                chave += caracteres[indice]
+            }
+
+            chaveCampo.value = chave
+        }
+
+        chaveSeguranca()
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.querySelector('input[type="file"]');
+            const select = document.getElementById('format-select');
+            const submitButton = document.getElementById('submit-button');
+
+            fileInput.addEventListener('change', function () {
+                const fileName = fileInput.value;
+
+                select.innerHTML = '';
+                submitButton.disabled = true;
+
+                if (fileName.endsWith('.mp4')) {
+                    select.innerHTML += '<option value="mp3">MP3</option>';
+                    submitButton.disabled = false;
+                }
+                else {
+                    select.innerHTML += '<option value="">Formato não suportado</option>';
+                    submitButton.disabled = true;
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropzone = document.getElementById('drop-zone');
+            const fileInput = document.querySelector('input[type="file"]');
+            const select = document.getElementById('format-select');
+            const submitButton = document.getElementById('submit-button');
+
+            // Prevenir comportamento padrão ao arrastar arquivos
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, event => event.preventDefault());
+            });
+
+            // Adicionar destaque ao arrastar arquivos
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.add('highlight'));
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.remove('highlight'));
+            });
+
+            // Gerenciar arquivos soltos na *dropzone*
+            dropzone.addEventListener('drop', (event) => {
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files; // Atualiza o input file
+                    const fileName = fileInput.value;
+
+                    select.innerHTML = '';
+                    submitButton.disabled = true;
+
+                    // Determinar os formatos disponíveis
+                    if (fileName.endsWith('.mp4')) {
+                        select.innerHTML += '<option value="mp3">MP3</option>';
+                        submitButton.disabled = false;
+                    } else {
+                        select.innerHTML += '<option value="">Formato não suportado</option>';
+                        submitButton.disabled = true;
+                    }
+                }
+            });
+
+            // Gerenciar seleção manual de arquivos
+            fileInput.addEventListener('change', function () {
+                const fileName = fileInput.value;
+
+                select.innerHTML = '';
+                submitButton.disabled = true;
+
+                if (fileName.endsWith('.mp4')) {
+                    select.innerHTML += '<option value="mp3">MP3</option>';
+                    submitButton.disabled = false;
+                } else {
+                    select.innerHTML += '<option value="">Formato não suportado</option>';
+                    submitButton.disabled = true;
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

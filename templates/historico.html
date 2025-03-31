@@ -1,0 +1,436 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fowlda</title>
+    <link rel="stylesheet" href="{% static 'style/estilo.css' %}">
+    <script>
+        function redirectToLink(selectElement) {
+            const selectedValue = selectElement.value;
+            if (selectedValue) {
+                window.location.href = selectedValue;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navegacao">
+        <div class="navegacao-items">
+            <a href="{% url 'index' %}">
+                <button class="button-55-2" role="button">
+                    <span class="text">Voltar</span>
+                </button>
+            </a>
+            <div class="list-choice">
+                <div class="list-choice-title">Conversores</div>
+                <div class="list-choice-objects">
+                    <label>
+                        <a href="{% url 'conversao' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Documentos</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'IMG' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Imagens</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'PLA' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Planilhas</span>
+                        </a>
+                    </label>
+                    <label>
+                        <a href="{% url 'VID' %}">
+                            <input type="radio" name="month">
+                            <span>Conversor de Vídeo</span>
+                        </a>
+                    </label>
+                </div>
+            </div>
+            {% if usu and not usu.is_superuser %}
+            <a href="{% url 'ajuda' %}">
+                <button class="button-55" role="button">
+                    <span class="text">Ajuda</span>
+                </button>
+            </a>
+            {% endif %}
+            {% if usu and usu.is_superuser %}
+            <a href="{% url 'gerenciar' %}">
+                <button class="button-55">Gerenciar</button>
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <div class="navegacao-items">
+            <h2 class="titulo-nav">FOWLDA</h2>
+            <a href="{% url 'historico' %}">
+                <button class="button-55" id="perfil">
+                    <p>{% if usu %}Meus arquivos{% else %}Login{% endif %}</p>
+                    <figure>
+                        <img src="{% static 'images/perfil.png' %}" alt="perfil" width="40">
+                    </figure>
+                </button>
+            </a>
+            {% if usu %}
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="button-55-2" id="logout">Desconectar</button>
+            </form>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="alinhamento">
+        <div class="overlay" id="overlay" style="display: {% if form.errors %}block{% else %}none{% endif %};"></div>
+
+        <div class="popup" id="popup-cadastro" style="display: {% if form.errors %}block{% else %}none{% endif %};">
+            <button class="button-55-2" onclick="fecharCadastro()" aria-label="Fechar">&times;</button>
+            <h2>Cadastro</h2>
+            <form class="formulario" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="cadastro_form" value="1">
+                {% for field in form %}
+                    <div class="{% if field.errors %}has-error{% endif %}">
+                        <div>
+                            {% for error in field.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="button-55">Cadastrar</button>
+            </form>
+            <p>Já possui uma conta? <a href="#" onclick="abrirLogin()">Faça login</a>.</p>
+        </div>
+
+        <div class="popup" id="popup-login" style="display: {% if error_message %}block{% else %}none{% endif %};">
+            <button class="button-55-2" onclick="fecharLogin()" aria-label="Fechar">&times;</button>
+            <h2>Login</h2>
+            <form class="formulario" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div>
+                {% endif %}
+                <div>
+                    <input type="email" name="email" placeholder="E-mail" required>
+                </div>
+                <div>
+                    <input type="password" name="password" placeholder="Senha" required>
+                </div>
+                <button type="submit" class="button-55">Entrar</button>
+            </form>            
+            <p>Não possui uma conta? <a href="#" onclick="abrirCadastro()">Cadastre-se</a>.</p>
+        </div>
+        <div class="principal2">
+            <h1>
+                Histórico de Conversões
+            </h1>
+        </div>
+        {% if usu %}
+        <div class="scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            Nome
+                        </th>
+                        <th>
+                            Data
+                        </th>
+                        <th>
+                            Usuário
+                        </th>
+                        <th>
+                            Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for arquivo in his %}
+                    <tr>
+                        <td>{{ arquivo.arquivo|cut:'app/static/files/' }}</td>
+                        <td>{{ arquivo.tempo }}</td>
+                        <td>
+                            {% if arquivo.usuario %}
+                            {{ arquivo.usuario.email }}
+                            {% else %}
+                            Não está logado
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'deleteHistorico' arquivo.id %}"><button class="button-55-2">
+                                    Excluir
+                                </button></a>
+                            <a href="{% static arquivo.arquivo|cut:'app/static' %}" download><button class="button-55">
+                                    Baixar
+                                </button></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if usu and usu.is_superuser %}
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <a href="{% url 'feed' %}">
+                <button class="button-55">Ver Feedbacks</button>
+            </a>
+        {% endif %}
+        {% if usu and not usu.is_superuser %}
+            <div>
+                <button class="button-55" role="button" onclick="togglePopup()"
+                    style="padding: 1rem; margin-top: 5rem;">CONVERTER ARQUIVOS</button>
+            </div>
+        {% endif %}
+
+        <div class="popup" id="popup" style="display: none;">
+            <h2 class="titulo-nav" style="font-size: 2rem;">Selecione o conversor que deseja usar</h2>
+            <a href="{% url 'conversao' %}">
+                <button class="button-55">
+                    Documentos
+                </button>
+            </a>
+            <a href="{% url 'PLA' %}">
+                <button class="button-55">
+                    Planilhas
+                </button>
+            </a>
+            <a href="{% url 'VID' %}">
+                <button class="button-55">
+                    Vídeos
+                </button>
+            </a>
+            <a href="{% url 'IMG' %}">
+                <button class="button-55">
+                    Imagens
+                </button>
+            </a>
+            <button class="button-55-2" onclick="togglePopup()" aria-label="Fechar">&times;</button>
+        </div>
+        {% if usu and not usu.is_superuser %}
+        <div>
+            <h1 style="margin-top: 10rem;">
+                Gostaria de reportar algo?
+            </h1>
+        </div>
+        <div>
+            <h2 style="margin-left: 2rem;">Envie seu Feedback!</h2>
+            <form class="feedback" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="feed_form" value="1">
+                {{ form2.as_p }}
+                <!-- <div class="estrelinhas">
+                    <label for="id_avaliacao">Avalie o site:</label>
+                    <div id="stars" class="rating">
+                        {% for i in "54321" %}
+                        <input type="radio" name="avaliacao" id="star-{{ i }}" value="{{ i }}">
+                        <label for="star-{{ i }}">&#9733;</label>
+                        {% endfor %}
+                    </div>
+                </div> -->
+                <button type="submit" class="button-55">Enviar</button>
+            </form>            
+        </div>
+        <div>
+            <a href="{% url 'meu_feedback' %}">
+                <button class="button-55">Meus Feedbacks</button>
+            </a>
+        </div>
+        {% endif %}
+        {% else %}
+        <h2>Faça login para aproveitar dos recursos de histórico de arquivos e envio de Feedbacks</h2>
+        {% endif %}
+        {% if usu %}
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="button-55-2" id="logout">Sair</button>
+        </form>
+        {% endif %}
+    </div>
+    <br>
+    <br>
+    {% if not usu %}
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    {% endif %}
+    
+    <footer>
+        <div>
+            <h2>Conversores</h2>
+            <ul>
+                <a class="links" href="{% url 'conversao' %}">
+                    <li>Conversor de Documentos</li>
+                </a>
+                <a class="links" href="{% url 'IMG' %}">
+                    <li>Conversor de Imagens</li>
+                </a>
+                <a class="links" href="{% url 'PLA' %}">
+                    <li>Conversor de Planilhas</li>
+                </a>
+                <a class="links" href="{% url 'VID' %}">
+                    <li>Conversor de Vídeos</li>
+                </a>
+            </ul>
+        </div>
+        <div>
+            <h1>Fowlda</h1>
+        </div>
+        <div id="feedback">
+            <h2>Envie-nos seu feedback</h2>
+            <ul>
+                <a class="links" href="#feedback">
+                    <li>Escrever mensagem</li>
+                </a>
+            </ul>
+        </div>
+    </footer>
+    <script>
+        // Função para abrir o popup de cadastro
+        function abrirCadastro() {
+            document.getElementById('popup-cadastro').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup-login').style.display = 'none';
+        }
+
+        // Função para fechar o popup de cadastro
+        function fecharCadastro() {
+            document.getElementById('popup-cadastro').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Função para abrir o popup de login
+        function abrirLogin() {
+            document.getElementById('popup-login').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup-cadastro').style.display = 'none';
+        }
+
+        // Função para fechar o popup de login
+        function fecharLogin() {
+            document.getElementById('popup-login').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Função para alternar o overlay baseado no estado dos popups
+        function toggleOverlay() {
+            const overlay = document.getElementById('overlay');
+            const popupCadastro = document.getElementById('popup-cadastro');
+            const popupLogin = document.getElementById('popup-login');
+            const pop2 = document.getElementById('pop2');
+
+            if (popupCadastro.style.display === 'block' || popupLogin.style.display === 'block' || (pop2 && pop2.style.display === 'block')) {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function toggleMenu() {
+            const menu = document.querySelector('.navegacao');
+            menu.classList.toggle('active');
+        }
+
+        function togglePopup() {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const isVisible = popup.style.display === 'block';
+
+            popup.style.display = isVisible ? 'none' : 'block';
+            overlay.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Exibe o formulário de cadastro automaticamente ao acessar histórico.html se o usuário não estiver logado
+        window.onload = function () {
+            const logado = "{{ logado }}"; // Variável passada pelo contexto
+            const hasErrors = "{{ form.errors|yesno:'true,false' }}" === "true";
+
+            if (logado === "None" || hasErrors) {
+                abrirCadastro(); // Mantém o popup aberto se não logado ou com erro no formulário
+            }
+            toggleOverlay(); // Atualiza o estado do overlay
+        };
+
+        // Atualizar estado do overlay
+        function toggleOverlay() {
+            const overlay = document.getElementById('overlay');
+            const popupCadastro = document.getElementById('popup-cadastro');
+            const popupLogin = document.getElementById('popup-login');
+
+            if (popupCadastro.style.display === 'block' || popupLogin.style.display === 'block') {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Lógica existente para o popup `pop2`
+        function closePop2() {
+            const pop2 = document.getElementById('pop2');
+            const overlay = document.getElementById('overlay');
+            if (pop2) {
+                pop2.style.display = 'none';
+            }
+            overlay.style.display = 'none';
+        }
+
+        // Selecionar usuário no menu dropdown
+        function Selecionar(usuario) {
+            const select = document.getElementById('CampoUsu');
+
+            if (!select) {
+                console.error('Elemento com id "campoUsu" não encontrado.');
+                return;
+            }
+
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].text === usuario) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // Chamando a função Selecionar com o valor do usuário
+        Selecionar("'Usuário:' {{ usu.email }}");
+
+        // Controlar a exibição do `pop2` baseado no estado de login
+        const logado = "{{ logado }}";
+        console.log(logado);
+
+        const outroPopup = document.getElementById('pop2');
+        if (logado !== 'None') {
+            outroPopup.style.display = 'none';
+        } else {
+            outroPopup.style.display = 'block';
+        }
+
+        // Atualizar overlay no carregamento da página
+        window.onload = toggleOverlay;
+
+    </script>
+</body>
+
+</html>
